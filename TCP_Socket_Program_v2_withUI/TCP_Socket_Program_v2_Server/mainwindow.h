@@ -3,8 +3,7 @@
 
 #include <QMainWindow>
 #include <QDebug>
-#include <QFile>
-#include <QFileDialog>
+
 #include <QMessageBox>
 #include <QMetaType>
 #include <QSet>
@@ -41,7 +40,8 @@ private slots:
 
 
     void refreshLabel();
-    void UIsendMessage();
+    void AutoSentMessage();
+    void sameClientError();
 
 
 

@@ -10,6 +10,7 @@
 #include <QTcpSocket>
 #include <QThread>
 #include <QValidator>
+#include <QDataStream>
 
 namespace Ui {
 class MainWindow;
@@ -30,10 +31,14 @@ private slots:
     void readSocket();
     void discardSocket();
     void displayError(QAbstractSocket::SocketError socketError);
-    void replyMessage(const QString& str);
+    void readMessage(const QString& str);
     void sendStr();
 
     void userLogin();
+    void depositMoney();
+    void withdrawMoney();
+    void transferMoney();
+    bool invalidEntry(QString text);
 
     void on_pushButton_depositMoney_clicked();
 
@@ -51,13 +56,19 @@ private slots:
 
     void on_pushButton_depositMoney_okay_clicked();
 
+    void on_lineEdit_depositMoney_amount_returnPressed();
+
     void on_pushButton_withdrawMoney_cancel_clicked();
 
     void on_pushButton_withdrawMoney_okay_clicked();
 
+    void on_lineEdit_withdrawMoney_amount_returnPressed();
+
     void on_pushButton_transferMoney_cancel_clicked();
 
     void on_pushButton_transferMoney_okay_clicked();
+
+    void on_lineEdit_transferMoney_amount_returnPressed();
 
     void on_lineEdit_transferMoney_customerID_textChanged(const QString &arg1);
 

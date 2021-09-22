@@ -145,7 +145,7 @@ void MainWindow::replyMessage(const QString& str)
     if(str.contains(';'))
     {
 //        strPost="str.contains(';')";
-//        UIsendMessage();
+//        AutoSentMessage();
         strClientPort=str.split(';');
         qDebug()<<strClientPort;
         // example output "1372;UserLogin,furkan,1234"
@@ -163,17 +163,18 @@ void MainWindow::replyMessage(const QString& str)
             d.userLogin(strList[1],strList[2]);
             if(d.message=="true"){
                 ID=d.customerID;
+
                 strPost="UserLogin,"+QString::number(d.customerID)+","+d.name+","+d.bank+","+QString::number(d.balance);
 //                strPost="UserLogin,\nMusteri No:"+QString::number(d.customerID)+
 //                        "\nisim:"+d.name+
 //                        "\nBanka:"+d.bank+
 //                        "\nBakiye:"+QString::number(d.balance);
-                UIsendMessage();
+                AutoSentMessage();
             }
             else
             {
                 strPost="UserLogin,incorrect username or password";
-                UIsendMessage();
+                AutoSentMessage();
             }
 
         }
@@ -182,7 +183,7 @@ void MainWindow::replyMessage(const QString& str)
         {
            d.depositMoney(strList[1].toInt(),strList[2].toDouble(),strList[3].toDouble());
            strPost="depositMoney,success,"+QString::number(d.balance);
-           UIsendMessage();
+           AutoSentMessage();
 
         }
 
@@ -191,13 +192,13 @@ void MainWindow::replyMessage(const QString& str)
            if(d.withdrawMoney(strList[1].toInt(),strList[2].toDouble(),strList[3].toDouble()))
            {
                strPost="withdrawMoney,success,"+QString::number(d.balance);
-               UIsendMessage();
+               AutoSentMessage();
 
            }
            else
            {
                strPost="withdrawMoney,insufficientBalance,"+QString::number(d.balance);
-               UIsendMessage();
+               AutoSentMessage();
 
            }
         }
@@ -215,34 +216,34 @@ void MainWindow::replyMessage(const QString& str)
                             {
                                 d.findCustomer(strList[1].toInt());
                                 strPost="transferMoney,success,"+d.info+","+QString::number(d.balance);
-                                UIsendMessage();
+                                AutoSentMessage();
                             }
 
                             else
                             {
                                 d.findCustomer(strList[1].toInt());
                                 strPost="transferMoney,insufficientBalance,"+ QString::number(d.balance);
-                                UIsendMessage();
+                                AutoSentMessage();
                             }
                         }
 
                         else
                         {   //receiverNameIsIncorrect
                             strPost="transferMoney,receiverNameIsIncorrect";
-                            UIsendMessage();
+                            AutoSentMessage();
                         }
 
                 }
                 else
                 {
                     strPost="transferMoney,receiverIsNotFound";
-                    UIsendMessage();
+                    AutoSentMessage();
                 }
             }
             else
             {
                 strPost="transferMoney,invalidReceiver";
-                UIsendMessage();
+                AutoSentMessage();
 
             }
 
@@ -256,13 +257,13 @@ void MainWindow::replyMessage(const QString& str)
            if(d.name!="")
            {
                strPost="customerIDCheck,"+d.name;
-               UIsendMessage();
+               AutoSentMessage();
 
            }
            else
            {
                strPost="customerIDCheck,-";
-               UIsendMessage();
+               AutoSentMessage();
            }
         }
 
@@ -270,7 +271,7 @@ void MainWindow::replyMessage(const QString& str)
         else
         {
             strPost="error";
-            UIsendMessage();
+            AutoSentMessage();
 
         }
     }
@@ -290,7 +291,7 @@ void MainWindow::refreshLabel(){
 
 }
 
-void MainWindow::UIsendMessage()
+void MainWindow::AutoSentMessage()
 {
 
 //        foreach (QTcpSocket* socket,connection_set)
@@ -307,9 +308,22 @@ void MainWindow::UIsendMessage()
             sendMessage(socket);
             break;
         }
+
     }
 
+}
 
+void MainWindow::sameClientError()
+{
+    foreach (QTcpSocket* socket,connection_set)
+    {
+        if(socket->socketDescriptor() == strClientPort[0].toLongLong())
+        {
+            sendMessage(socket);
+            break;
+        }
+
+    }
 }
 
 

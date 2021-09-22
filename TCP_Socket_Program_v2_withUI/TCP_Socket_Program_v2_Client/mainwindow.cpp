@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     socket = new QTcpSocket(this);
 
-    connect(this, &MainWindow::newMessage, this, &MainWindow::replyMessage);
+    connect(this, &MainWindow::newMessage, this, &MainWindow::readMessage);
     connect(socket, &QTcpSocket::readyRead, this, &MainWindow::readSocket);
     connect(socket, &QTcpSocket::disconnected, this, &MainWindow::discardSocket);
     connect(socket, &QAbstractSocket::errorOccurred, this, &MainWindow::displayError);
@@ -94,7 +94,7 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
     }
 }
 
-void MainWindow::replyMessage(const QString& str)
+void MainWindow::readMessage(const QString& str)
 {
 
 
@@ -124,7 +124,7 @@ void MainWindow::replyMessage(const QString& str)
             }
             else
             {
-                QMessageBox::warning(this,"Müşteri Girişi","Kullanıcı adı veye şifre yanlış.");
+                QMessageBox::warning(this,"Müşteri Girişi","Kullanıcı adı veya şifre yanlış.");
             }
         }
         else if(strList[0]=="depositMoney")
@@ -213,6 +213,33 @@ void MainWindow::replyMessage(const QString& str)
             }
 
         }
+        else if(strList[0]=="moneyTransferHasArrived")
+        {
+            if(strList[1]!=ID)
+            {
+                ID=strList[1].toInt();
+                name=strList[2];
+                bank=strList[3];
+                balance=strList[4].toDouble();
+
+                ui->label_CustomerData_ID->setText(QString::number(ID));
+                ui->label_CustomerData_name->setText(name);
+                ui->label_CustomerData_nameOfTheBank->setText(bank);
+                ui->label_CustomerData_balance->setText(QString::number(balance)+"₺");
+
+                QMessageBox::information(this,"Para Transferi","Hesabınıza Para Geldi! ☺ \nMevcut Bakiye: " +strList[2]+"₺");
+
+                ui->tabWidget->setTabVisible(0,false);
+                ui->tabWidget->setTabVisible(2,false);
+                ui->tabWidget->setTabVisible(3,false);
+                ui->tabWidget->setTabVisible(4,false);
+                ui->tabWidget->setTabVisible(1,true);
+
+
+            }
+
+
+        }
 
 
     }
@@ -237,22 +264,129 @@ void MainWindow::sendStr()
 
 void MainWindow::userLogin()
 {
-    if(socket)
+    if (invalidEntry(ui->lineEdit_UserLogin_userName->text()+ui->lineEdit_UserLogin_pass->text()))
     {
-        if(socket->isOpen())
+        if(socket)
         {
-            str = "UserLogin,"+ui->lineEdit_UserLogin_userName->text() + ","+ ui->lineEdit_UserLogin_pass->text();
-            sendStr();
+            if(socket->isOpen())
+            {
+                str = "UserLogin,"+ui->lineEdit_UserLogin_userName->text() + ","+ ui->lineEdit_UserLogin_pass->text();
+                sendStr();
 
-            ui->lineEdit_UserLogin_pass->clear();
+                ui->lineEdit_UserLogin_pass->clear();
+
+            }
+            else
+                QMessageBox::critical(this,"QTCPClient","Socket kapalı.");
+        }
+        else
+            QMessageBox::critical(this,"QTCPClient","Client, sunucuya bağlı değil.");
+
+    }
+    else
+        QMessageBox::critical(this,"Hata!","Kullanıcı adı veya şifre izin verilmeyen karekter içeriyor.");
+
+
+}
+
+void MainWindow::depositMoney()
+{
+    if(ui->lineEdit_depositMoney_amount->text().toDouble()>0)
+    {
+        if(socket)
+        {
+            if(socket->isOpen())
+            {
+                str = "depositMoney,"+QString::number(ID)+","+ QString::number(balance)+","+ui->lineEdit_depositMoney_amount->text();
+
+                sendStr();
+
+                ui->lineEdit_depositMoney_amount->clear();
+
+            }
+            else
+                QMessageBox::critical(this,"QTCPClient","Socket kapalı.");
+        }
+        else
+            QMessageBox::critical(this,"QTCPClient","Client, sunucuya bağlı değil.");
+
+    }
+    else
+        QMessageBox::critical(this,"Tutar Hatalı!","Lütfen sıfırdan büyük bir değer giriniz.");
+}
+
+void MainWindow::withdrawMoney()
+{
+    if(ui->lineEdit_withdrawMoney_amount->text().toDouble()>0)
+    {
+        if(socket)
+        {
+            if(socket->isOpen())
+            {
+                str =  "withdrawMoney,"+
+                        QString::number(ID)+","+
+                        QString::number(balance)+","+
+                        ui->lineEdit_withdrawMoney_amount->text();
+
+                sendStr();
+
+                ui->lineEdit_withdrawMoney_amount->clear();
+
+            }
+            else
+                QMessageBox::critical(this,"QTCPClient","");
+        }
+        else
+            QMessageBox::critical(this,"QTCPClient","Client, sunucuya bağlı değil.");
+    }
+    else
+        QMessageBox::critical(this,"Tutar Hatalı!","Lütfen sıfırdan büyük bir değer giriniz.");
+
+}
+
+void MainWindow::transferMoney()
+{
+    if(invalidEntry(ui->lineEdit_transferMoney_customerName->text()))
+    {
+        if(ui->lineEdit_transferMoney_amount->text().toDouble()>0)
+        {
+            if(socket)
+            {
+                if(socket->isOpen())
+                {                   //0
+                    str = "transferMoney,"+QString::number(ID)+","+             //1
+                            ui->lineEdit_transferMoney_customerID->text()+","+  //2
+                            QString::number(balance)+","+                       //3
+                            ui->lineEdit_transferMoney_amount->text()+","+      //4
+                            ui->lineEdit_transferMoney_customerName->text();    //5
+
+                    sendStr();
+
+                }
+                else
+                    QMessageBox::critical(this,"QTCPClient","Socket kapalı.");
+            }
+            else
+                QMessageBox::critical(this,"QTCPClient","Client, sunucuya bağlı değil.");
 
         }
         else
-            QMessageBox::critical(this,"QTCPClient","Socket doesn't seem to be opened");
+            QMessageBox::critical(this,"Tutar Hatalı!","Lütfen sıfırdan büyük bir değer giriniz.");
+    }
+
+    else
+        QMessageBox::critical(this,"Hata!","Alıcı adı geçersiz karekter içeriyor.");
+
+}
+
+bool MainWindow::invalidEntry(QString text)
+{
+    if(text.contains(';') || text.contains(',') || text.length()==0)
+    {
+        return false;
     }
     else
-        QMessageBox::critical(this,"QTCPClient","Not connected");
-
+        return true;
 }
 
 
@@ -299,6 +433,7 @@ void MainWindow::on_pushButton_exit_clicked()
     bank="";
     name="";
     balance=-1;
+
 }
 
 
@@ -323,23 +458,13 @@ void MainWindow::on_pushButton_depositMoney_cancel_clicked()
 
 void MainWindow::on_pushButton_depositMoney_okay_clicked()
 {
-    if(socket)
-    {
-        if(socket->isOpen())
-        {
-            str = "depositMoney,"+QString::number(ID)+","+ QString::number(balance)+","+ui->lineEdit_depositMoney_amount->text();
+    depositMoney();
 
-            sendStr();
+}
 
-            ui->lineEdit_depositMoney_amount->clear();
-
-        }
-        else
-            QMessageBox::critical(this,"QTCPClient","Socket doesn't seem to be opened");
-    }
-    else
-        QMessageBox::critical(this,"QTCPClient","Not connected");
-
+void MainWindow::on_lineEdit_depositMoney_amount_returnPressed()
+{
+   depositMoney();
 }
 
 
@@ -355,26 +480,13 @@ void MainWindow::on_pushButton_withdrawMoney_cancel_clicked()
 
 void MainWindow::on_pushButton_withdrawMoney_okay_clicked()
 {
-    if(socket)
-    {
-        if(socket->isOpen())
-        {
-            str =  "withdrawMoney,"+
-                    QString::number(ID)+","+
-                    QString::number(balance)+","+
-                    ui->lineEdit_withdrawMoney_amount->text();
+    withdrawMoney();
 
-            sendStr();
+}
 
-            ui->lineEdit_withdrawMoney_amount->clear();
-
-        }
-        else
-            QMessageBox::critical(this,"QTCPClient","");
-    }
-    else
-        QMessageBox::critical(this,"QTCPClient","Not connected");
-
+void MainWindow::on_lineEdit_withdrawMoney_amount_returnPressed()
+{
+    withdrawMoney();
 }
 
 
@@ -387,39 +499,18 @@ void MainWindow::on_pushButton_transferMoney_cancel_clicked()
     ui->lineEdit_transferMoney_customerID->clear();
     ui->lineEdit_transferMoney_customerName->clear();
 
-
 }
-
 
 void MainWindow::on_pushButton_transferMoney_okay_clicked()
 {
-    if(socket)
-    {
-        if(socket->isOpen())
-        {                   //0
-            str = "transferMoney,"+QString::number(ID)+","+             //1
-                    ui->lineEdit_transferMoney_customerID->text()+","+  //2
-                    QString::number(balance)+","+                       //3
-                    ui->lineEdit_transferMoney_amount->text()+","+      //4
-                    ui->lineEdit_transferMoney_customerName->text();    //5
-
-            sendStr();
-
-        }
-        else
-            QMessageBox::critical(this,"QTCPClient","Socket doesn't seem to be opened");
-    }
-    else
-        QMessageBox::critical(this,"QTCPClient","Not connected");
+    transferMoney();
 
 }
 
-
-
-
-
-
-
+void MainWindow::on_lineEdit_transferMoney_amount_returnPressed()
+{
+    transferMoney();
+}
 
 void MainWindow::on_lineEdit_transferMoney_customerID_textChanged(const QString &arg1)
 {
@@ -436,15 +527,18 @@ void MainWindow::on_lineEdit_transferMoney_customerID_textChanged(const QString 
                 sendStr();
             }
             else
-                QMessageBox::critical(this,"QTCPClient","Socket doesn't seem to be opened");
+                QMessageBox::critical(this,"QTCPClient","Socket kapalı.");
         }
         else
-            QMessageBox::critical(this,"QTCPClient","Not connected");
+            QMessageBox::critical(this,"QTCPClient","Client, sunucuya bağlı değil.");
 
     }
     else
         ui->label_nameHint->setText("");
 }
+
+
+
 
 
 
