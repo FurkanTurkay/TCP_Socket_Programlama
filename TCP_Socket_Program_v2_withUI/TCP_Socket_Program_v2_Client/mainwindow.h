@@ -4,14 +4,12 @@
 #include <QMainWindow>
 #include <QAbstractSocket>
 #include <QDebug>
-#include <QFile>
-#include <QFileDialog>
 #include <QHostAddress>
 #include <QMessageBox>
-#include <QMetaType>
 #include <QString>
-#include <QStandardPaths>
 #include <QTcpSocket>
+#include <QThread>
+#include <QValidator>
 
 namespace Ui {
 class MainWindow;
@@ -62,8 +60,6 @@ private slots:
     void on_pushButton_transferMoney_okay_clicked();
 
     void on_lineEdit_transferMoney_customerID_textChanged(const QString &arg1);
-
-
 
 private:
     Ui::MainWindow *ui;

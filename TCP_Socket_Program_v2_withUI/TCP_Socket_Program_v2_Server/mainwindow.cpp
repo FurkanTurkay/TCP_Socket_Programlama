@@ -140,7 +140,7 @@ void MainWindow::sendMessage(QTcpSocket* socket)
 
 void MainWindow::replyMessage(const QString& str)
 {
-    database d;     //@@@@@@@@@ define at .h file
+
     qDebug()<<str;
     if(str.contains(';'))
     {
@@ -148,6 +148,8 @@ void MainWindow::replyMessage(const QString& str)
 //        UIsendMessage();
         strClientPort=str.split(';');
         qDebug()<<strClientPort;
+        // example output "1372;UserLogin,furkan,1234"
+
         strList= strClientPort[1].split(',');
         qDebug()<<strList;
         for(int i=0;i<strList.count();i++)
@@ -204,36 +206,46 @@ void MainWindow::replyMessage(const QString& str)
         {
             d.name="";
             d.findCustomer(strList[2].toInt());
-            if(d.name!=""){
-                    if(d.name==strList[5])// check receiver name
-                    {
-                        if(d.transferMoney(strList[1].toInt(),strList[2].toInt(),strList[4].toDouble()))
+            if(strList[1]!=strList[2])
+            {
+                if(d.name!=""){
+                        if(d.name==strList[5])// check receiver name
                         {
-                            d.findCustomer(strList[1].toInt());
-                            strPost="transferMoney,success,"+d.info+","+QString::number(d.balance);
-                            UIsendMessage();
+                            if(d.transferMoney(strList[1].toInt(),strList[2].toInt(),strList[4].toDouble()))
+                            {
+                                d.findCustomer(strList[1].toInt());
+                                strPost="transferMoney,success,"+d.info+","+QString::number(d.balance);
+                                UIsendMessage();
+                            }
+
+                            else
+                            {
+                                d.findCustomer(strList[1].toInt());
+                                strPost="transferMoney,insufficientBalance,"+ QString::number(d.balance);
+                                UIsendMessage();
+                            }
                         }
 
                         else
-                        {
-                            d.findCustomer(strList[1].toInt());
-                            strPost="transferMoney,insufficientBalance,"+ QString::number(d.balance);
+                        {   //receiverNameIsIncorrect
+                            strPost="transferMoney,receiverNameIsIncorrect";
                             UIsendMessage();
                         }
-                    }
 
-                    else
-                    {   //receiverNameIsIncorrect
-                        strPost="transferMoney,receiverNameIsIncorrect";
-                        UIsendMessage();
-                    }
-
+                }
+                else
+                {
+                    strPost="transferMoney,receiverIsNotFound";
+                    UIsendMessage();
+                }
             }
             else
             {
-                strPost="transferMoney,receiverIsNotFound";
+                strPost="transferMoney,invalidReceiver";
                 UIsendMessage();
+
             }
+
 
         }
         else if(strList[0]=="customerIDCheck")
@@ -263,23 +275,6 @@ void MainWindow::replyMessage(const QString& str)
         }
     }
 
-
-
-//      *** string split ***
-//    d.dbFindRecord(ui->tableWidget_invoiceRecord->item(mSelectedRow_invoiceRecords,0)->text().toInt());
-//    str=d.db_productsInTheCart;
-
-//    strList= str.split(',');
-//    qDebug()<<strList;
-//    qDebug()<<strList.count();
-//    for(int i=0;i<strList.count()-1;i++){
-//        qDebug()<<strList[i];
-//        strListNumber= strList[i].split('*');
-//        qDebug()<<strListNumber;
-//         d.dbFindProduct(strListNumber[0]);
-//        qDebug()<<i<<". Ürün Barkodu:"<<strListNumber[0]<<" Ürün Adı: "<<d.db_productName <<" adet: "<<strListNumber[1];
-//    }
-
 }
 
 
@@ -298,10 +293,21 @@ void MainWindow::refreshLabel(){
 void MainWindow::UIsendMessage()
 {
 
-        foreach (QTcpSocket* socket,connection_set)
+//        foreach (QTcpSocket* socket,connection_set)
+//        {
+//            sendMessage(socket);
+//        }
+
+    //
+    //multi-client connection bug solved.
+    foreach (QTcpSocket* socket,connection_set)
+    {
+        if(socket->socketDescriptor() == strClientPort[0].toLongLong())
         {
             sendMessage(socket);
+            break;
         }
+    }
 
 
 }

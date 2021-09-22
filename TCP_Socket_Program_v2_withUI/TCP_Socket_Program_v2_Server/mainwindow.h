@@ -55,6 +55,7 @@ private:
     int ID;
     QString strPost;
     QString label;
+    database d;
 };
 
 #endif // MAINWINDOW_H
