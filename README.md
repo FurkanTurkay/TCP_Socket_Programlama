@@ -1,6 +1,8 @@
 # TCP_Socket_Programlama
 Programın güncel versiyonu arayüz sürümüdür.
 
+*Qt 5.15.2 MinGW 64-bit
+
 ![Screenshot_188](https://user-images.githubusercontent.com/88648358/134529596-32993d34-8eed-4d85-a1eb-90ccd522392a.jpg)
 ![Screenshot_189](https://user-images.githubusercontent.com/88648358/134529678-d68b24f3-27e5-4498-92d9-2cb6316aeb34.jpg)
 
