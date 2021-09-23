@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         QMessageBox::critical(this,"QTCPServer",QString("Sunucu başlatılamıyor: %1.").arg(m_server->errorString()));
         exit(EXIT_FAILURE);
     }
+
+    clientNumber=0;
 }
 
 MainWindow::~MainWindow()
@@ -38,6 +40,7 @@ void MainWindow::newConnection()
 {
     while (m_server->hasPendingConnections())
         appendToSocketList(m_server->nextPendingConnection());
+
 }
 
 void MainWindow::appendToSocketList(QTcpSocket* socket)
@@ -46,9 +49,12 @@ void MainWindow::appendToSocketList(QTcpSocket* socket)
     connect(socket, &QTcpSocket::readyRead, this, &MainWindow::readSocket);
     connect(socket, &QTcpSocket::disconnected, this, &MainWindow::discardSocket);
     connect(socket, &QAbstractSocket::errorOccurred, this, &MainWindow::displayError);
+    receiverClientList<<QString::number(socket->socketDescriptor());
     label=label+"\n"+QString::number(socket->socketDescriptor());
     ui->label_receiverClientList->setText(label);
     replyMessage(QString("INFO :: Client: %1 bağlandı ! ").arg(socket->socketDescriptor()));
+    clientNumber++;
+    ui->label_clientNumber->setText(QString::number(clientNumber));
 }
 
 void MainWindow::readSocket()
@@ -82,11 +88,14 @@ void MainWindow::discardSocket()
 {
     QTcpSocket* socket = reinterpret_cast<QTcpSocket*>(sender());
     QSet<QTcpSocket*>::iterator it = connection_set.find(socket);
+    qDebug()<<socket->socketDescriptor()<<"  Client ayrıldı";
     if (it != connection_set.end()){
-        replyMessage(QString("INFO :: Bir client ayrıldı.").arg(socket->socketDescriptor()));
+        replyMessage(QString("INFO :: Bir client ayrıldı. %1").arg(socket->socketDescriptor()));
         connection_set.remove(*it);
     }
+    clientNumber--;
     refreshLabel();
+    deleteSocketID();
 
     socket->deleteLater();
 }
@@ -163,19 +172,36 @@ void MainWindow::replyMessage(const QString& str)
             d.userLogin(strList[1],strList[2]);
             if(d.message=="true"){
                 ID=d.customerID;
+                if(!sameUserError(ID))
+                {
+                    strPost="UserLogin,"+QString::number(d.customerID)+","+d.name+","+d.bank+","+QString::number(d.balance);
+    //                strPost="UserLogin,\nMusteri No:"+QString::number(d.customerID)+
+    //                        "\nisim:"+d.name+
+    //                        "\nBanka:"+d.bank+
+    //                        "\nBakiye:"+QString::number(d.balance);
+                    AutoSentMessage();
 
-                strPost="UserLogin,"+QString::number(d.customerID)+","+d.name+","+d.bank+","+QString::number(d.balance);
-//                strPost="UserLogin,\nMusteri No:"+QString::number(d.customerID)+
-//                        "\nisim:"+d.name+
-//                        "\nBanka:"+d.bank+
-//                        "\nBakiye:"+QString::number(d.balance);
-                AutoSentMessage();
+                    matchIDwithSocket(ID,true);
+                }
+                else
+                {
+                    strPost="UserLogin,sameUserError";
+
+                    AutoSentMessage();
+                }
+
+
             }
             else
             {
                 strPost="UserLogin,incorrect username or password";
                 AutoSentMessage();
             }
+
+        }
+        else if(strList[0]=="userLogout")
+        {
+            matchIDwithSocket(strList[1].toInt(),false);    //delete the pairing
 
         }
 
@@ -280,14 +306,20 @@ void MainWindow::replyMessage(const QString& str)
 
 
 void MainWindow::refreshLabel(){
-    ui->label_receiverClientList->clear();
-    label="BroadCast";
+
+    label="";
+    receiverClientList.clear();
     ui->label_receiverClientList->setText(label);
+    ui->label_clientNumber->setText(QString::number(clientNumber));
     foreach(QTcpSocket* socket, connection_set)
     {
+        receiverClientList<<QString::number(socket->socketDescriptor());
         label=label+"\n"+QString::number(socket->socketDescriptor());
         ui->label_receiverClientList->setText(label);
+        ui->label_clientNumber->setText(QString::number(clientNumber));
+
     }
+
 
 }
 
@@ -313,17 +345,111 @@ void MainWindow::AutoSentMessage()
 
 }
 
-void MainWindow::sameClientError()
+void MainWindow::matchIDwithSocket(int clientID,bool operation)
 {
-    foreach (QTcpSocket* socket,connection_set)
-    {
-        if(socket->socketDescriptor() == strClientPort[0].toLongLong())
-        {
-            sendMessage(socket);
-            break;
-        }
+//
+//
+    strSocket= strClientPort[0]+" :: "+QString::number(clientID);
 
+    if(operation) //match ID with Socket Number
+    {
+        socketList<<strSocket;
     }
+    else
+        socketList.removeOne(strSocket);//remove client
+
+//    qDebug()<<socketList;
+//    qDebug()<<socketList.count();
+
+    //to refresh label
+    text_clientNumberwithID="";
+    for (int i=0;i<socketList.count();i++ ) {
+        text_clientNumberwithID=text_clientNumberwithID+socketList[i]+"\n";
+    }
+    ui->label_client_ID->setText(text_clientNumberwithID);
+    //**********
+
+    qDebug()<<"ın matchIDwithSocket function: "<<socketList;
+
+}
+
+void MainWindow::deleteSocketID()   //To report the server if the user close the client program
+{
+//    socketListStr="";
+//    for (int i = 0; i<socketList.count();i++)
+//    {
+//    socketListStr=socketListStr+socketList[i]+",";
+//    }
+
+
+//    if(socketListStr.contains(" "))
+
+    m_socketList.clear();
+    for (int i=0;i<socketList.count();i++)
+    {
+        if(socketList[i].contains(" "))
+            m_socketList<<socketList[i].split(' ')[0];
+    }
+    qDebug()<<"before remove receviverClientList: "<<m_socketList;
+    qDebug()<<"in delete socketID recevier clients list:"<<receiverClientList;
+
+
+    for (int i=0;i<receiverClientList.count();i++) {
+        m_socketList.removeOne(receiverClientList[i]);
+    }
+
+    qDebug()<<"m_socketList: "<<m_socketList;
+    if(!m_socketList.isEmpty())
+        socketNumberLeavingServer=m_socketList[0];
+    qDebug()<<" socketNumberLeavingServer:" <<socketNumberLeavingServer;
+
+
+    for (int i=0;i<socketList.count();i++ ) {
+        if(socketList[i].contains(socketNumberLeavingServer+" :: "))
+        socketList.removeAt(i);
+    }
+
+    //to refresh label
+    text_clientNumberwithID="";
+    for (int i=0;i<socketList.count();i++ ) {
+        text_clientNumberwithID=text_clientNumberwithID+socketList[i]+"\n";
+    }
+    ui->label_client_ID->setText(text_clientNumberwithID);
+    //**********
+
+//    for (int i=0;i<socketList.count();i++ ) {
+//        text_clientNumberwithID=text_clientNumberwithID+socketList[i]+"\n";
+//        socketListStr=socketListStr+socketList[i]+",";
+//    }
+
+    ui->label_client_ID->setText(text_clientNumberwithID);
+
+}
+
+void MainWindow::findSocketNumberLeavingServer()
+{
+//    m_receiverClientList.clear();
+//    for (int i=0;i<receiverClientList.count();i++)
+//    {
+//        m_socketList<<receiverClientList[i];
+//    }
+}
+
+bool MainWindow::sameUserError(int clientID)//If it returns true, login is not allowed
+{
+
+    //qDebug()<<socketListStr;
+    qDebug()<<"sameUserError: socket list "<<socketList;
+    bool returnValue =false;
+    for (int i=0;i<socketList.count();i++ ) {
+        if(socketList[i].contains(" :: "+QString::number(clientID))){
+            qDebug()<<"sameUserError in for: "<<i<<socketList[i];
+            returnValue = true;
+
+        }
+    }
+    return returnValue;
+
 }
 
 

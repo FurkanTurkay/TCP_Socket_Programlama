@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 21 Eyl 2021, 22:39:31
+-- Üretim Zamanı: 23 Eyl 2021, 09:54:09
 -- Sunucu sürümü: 8.0.17
 -- PHP Sürümü: 7.3.10
 
@@ -42,11 +42,12 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`CustomerID`, `username`, `password`, `name`, `bank`, `balance`) VALUES
-(1, 'furkan', '1234', 'Furkan Türkay', 'A', 730),
-(2, 'ahmet', '1234', 'Ahmet Yavuz', 'B', 30000),
-(3, 'Mehmet', '1234', 'Mehmet Aydın', 'A', 999999),
-(4, 'Faruk', '1234', 'Faruk Çetin', 'C', 4000),
-(5, 'Osman', '1234', 'Osman Demir', 'C', 715);
+(1, 'furkan', '1234', 'Furkan Türkay', 'A', 43000),
+(2, 'ahmet', '1234', 'Ahmet Yavuz', 'B', 29995),
+(3, 'mehmet', '1234', 'Mehmet Aydın', 'A', 999999),
+(4, 'faruk', '1234', 'Faruk Çetin', 'C', 4000),
+(5, 'osman', '1234', 'Osman Demir', 'C', 1138),
+(6, 'burak', '1234', 'Burak Beyaz', 'A', 100000);
 
 --
 -- Dökümü yapılmış tablolar için indeksler

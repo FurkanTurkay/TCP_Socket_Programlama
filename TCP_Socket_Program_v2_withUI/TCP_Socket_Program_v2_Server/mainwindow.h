@@ -10,6 +10,7 @@
 #include <QStandardPaths>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QStringList>
 
 #include "database.h"
 
@@ -41,7 +42,11 @@ private slots:
 
     void refreshLabel();
     void AutoSentMessage();
-    void sameClientError();
+    void matchIDwithSocket(int clientID,bool operation);
+    void deleteSocketID();
+    void findSocketNumberLeavingServer();
+    bool sameUserError(int clientID);
+
 
 
 
@@ -52,10 +57,26 @@ private:
     QSet<QTcpSocket*> connection_set;
     QStringList strList;
     QStringList strClientPort;
+    QString strSocket;
+    QStringList receiverClientList;
+    QStringList m_receiverClientList;
+    QStringList socketList;
+    QStringList m_socketList;
+    QString socketListStr;
+    QString socketNumberLeavingServer;
+
+
     int ID;
     QString strPost;
     QString label;
+
     database d;
+
+
+    int clientNumber;
+    QString text_clientNumberwithID;
+
+    bool boolValue;
 };
 
 #endif // MAINWINDOW_H

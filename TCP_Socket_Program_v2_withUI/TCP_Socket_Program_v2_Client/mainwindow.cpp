@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->setTabVisible(2,false);
     ui->tabWidget->setTabVisible(3,false);
     ui->tabWidget->setTabVisible(4,false);
+    ui->tabWidget->setUsesScrollButtons(false);
 
     ui->lineEdit_transferMoney_customerID->setValidator(new QIntValidator());
     ui->lineEdit_withdrawMoney_amount->setValidator(new QIntValidator());
@@ -107,6 +108,9 @@ void MainWindow::readMessage(const QString& str)
         {
             if(strList[1]!="incorrect username or password")
             {
+                if(strList[1]!="sameUserError"){
+
+
                 ID=strList[1].toInt();
                 name=strList[2];
                 bank=strList[3];
@@ -119,6 +123,11 @@ void MainWindow::readMessage(const QString& str)
 
                 ui->tabWidget->setTabVisible(0,false);
                 ui->tabWidget->setTabVisible(1,true);
+                }
+                else
+                {
+                    QMessageBox::warning(this,"Kullanıcı Girişi Reddedildi ","Kullanıcı başka bir client üzerinde giriş yapmış.");
+                }
 
 
             }
@@ -422,7 +431,20 @@ void MainWindow::on_pushButton_transferMoney_clicked()
 
 void MainWindow::on_pushButton_exit_clicked()
 {
-
+    if(socket)
+    {
+        if(socket->isOpen())
+        {
+            str = "userLogout,"+QString::number(ID);
+            sendStr();
+        }
+        else
+            QMessageBox::critical(this,"QTCPClient","Socket kapalı."
+                                                    "\nSunucuya oturum kapatma bilgisi gönderilemedi.");
+    }
+    else
+        QMessageBox::critical(this,"QTCPClient","Client, sunucuya bağlı değil."
+                                                "\nSunucuya oturum kapatma bilgisi gönderilemedi.");
 
     ui->tabWidget->setTabVisible(1,false);//menu
     ui->lineEdit_UserLogin_userName->clear();
