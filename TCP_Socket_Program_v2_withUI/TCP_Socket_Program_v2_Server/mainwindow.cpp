@@ -146,6 +146,48 @@ void MainWindow::sendMessage(QTcpSocket* socket)
         QMessageBox::critical(this,"QTCPServer","Client, sunucuya bağlı değil.");
 }
 
+void MainWindow::moneyTransferMessage(int receiverID)
+{
+    qDebug()<<socketList;
+    receiverDescriptor="-1";
+    for (int i=0;i<socketList.count();i++) {
+        if(socketList[i].contains(" :: "))
+        {
+            if(socketList[i].split(" :: ")[1]==QString::number(receiverID))
+            {
+
+                receiverDescriptor=socketList[i].split(" :: ")[0];
+                qDebug()<<" receiverDescriptor=socketList["<<i<<"] -> "<<receiverDescriptor;
+            }
+
+        }
+
+    }
+    qDebug()<<" receiverDescriptor="<<receiverDescriptor;
+
+
+
+    if(receiverDescriptor!=""){
+        d.findCustomer(receiverID);
+        strPost="moneyTransferHasArrived,"+         //0
+                QString::number(d.customerID)+","+  //1
+                d.name+","+                         //2
+                d.bank+","+                         //3
+                QString::number(d.balance);         //4
+
+        foreach (QTcpSocket* socket,connection_set)
+        {
+            if(socket->socketDescriptor() == receiverDescriptor.toLongLong())
+            {
+                sendMessage(socket);
+                break;
+            }
+
+        }
+    }
+
+}
+
 
 void MainWindow::replyMessage(const QString& str)
 {
@@ -243,6 +285,10 @@ void MainWindow::replyMessage(const QString& str)
                                 d.findCustomer(strList[1].toInt());
                                 strPost="transferMoney,success,"+d.info+","+QString::number(d.balance);
                                 AutoSentMessage();
+
+                                moneyTransferMessage(strList[2].toInt());
+
+
                             }
 
                             else
@@ -426,14 +472,6 @@ void MainWindow::deleteSocketID()   //To report the server if the user close the
 
 }
 
-void MainWindow::findSocketNumberLeavingServer()
-{
-//    m_receiverClientList.clear();
-//    for (int i=0;i<receiverClientList.count();i++)
-//    {
-//        m_socketList<<receiverClientList[i];
-//    }
-}
 
 bool MainWindow::sameUserError(int clientID)//If it returns true, login is not allowed
 {

@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>TCP Socket Program (Client)</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="icons.qrc">
+    <normaloff>:/new/prefix1/customer.png</normaloff>:/new/prefix1/customer.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_7">
     <item>
@@ -30,7 +34,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="usesScrollButtons">
        <bool>false</bool>
@@ -138,6 +142,9 @@
                   <height>25</height>
                  </size>
                 </property>
+                <property name="clearButtonEnabled">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
              </layout>
@@ -185,6 +192,9 @@
                 </property>
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
+                </property>
+                <property name="clearButtonEnabled">
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -774,6 +784,9 @@
                   <height>25</height>
                  </size>
                 </property>
+                <property name="clearButtonEnabled">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
              </layout>
@@ -977,6 +990,9 @@
                   <height>25</height>
                  </size>
                 </property>
+                <property name="clearButtonEnabled">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
              </layout>
@@ -1019,6 +1035,9 @@
                   <width>150</width>
                   <height>25</height>
                  </size>
+                </property>
+                <property name="clearButtonEnabled">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -1116,6 +1135,8 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

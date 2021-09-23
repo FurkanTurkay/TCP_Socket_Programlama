@@ -70,7 +70,9 @@ private slots:
 
     void on_lineEdit_transferMoney_amount_returnPressed();
 
-    void on_lineEdit_transferMoney_customerID_textChanged(const QString &arg1);
+    void on_lineEdit_transferMoney_customerID_editingFinished();
+
+    void on_lineEdit_transferMoney_customerID_textEdited(const QString &arg1);
 
 private:
     Ui::MainWindow *ui;

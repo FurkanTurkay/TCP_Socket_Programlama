@@ -38,14 +38,14 @@ private slots:
 
     void replyMessage(const QString& str);
     void sendMessage(QTcpSocket* socket);
-
+    void moneyTransferMessage(int receiverID);
 
     void refreshLabel();
     void AutoSentMessage();
     void matchIDwithSocket(int clientID,bool operation);
     void deleteSocketID();
-    void findSocketNumberLeavingServer();
     bool sameUserError(int clientID);
+
 
 
 
@@ -65,6 +65,7 @@ private:
     QString socketListStr;
     QString socketNumberLeavingServer;
 
+    QString receiverDescriptor;
 
     int ID;
     QString strPost;

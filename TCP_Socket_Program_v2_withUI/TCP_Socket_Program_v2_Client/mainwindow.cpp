@@ -7,11 +7,18 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->tabWidget->setTabEnabled(1,false);
+    ui->tabWidget->setTabEnabled(2,false);
+    ui->tabWidget->setTabEnabled(3,false);
+    ui->tabWidget->setTabEnabled(4,false);
+
     ui->tabWidget->setTabVisible(1,false);
     ui->tabWidget->setTabVisible(2,false);
     ui->tabWidget->setTabVisible(3,false);
     ui->tabWidget->setTabVisible(4,false);
     ui->tabWidget->setUsesScrollButtons(false);
+
+
 
     ui->lineEdit_transferMoney_customerID->setValidator(new QIntValidator());
     ui->lineEdit_withdrawMoney_amount->setValidator(new QIntValidator());
@@ -122,6 +129,8 @@ void MainWindow::readMessage(const QString& str)
                 ui->label_CustomerData_balance->setText(QString::number(balance)+"₺");
 
                 ui->tabWidget->setTabVisible(0,false);
+                ui->tabWidget->setTabEnabled(0,false);
+                ui->tabWidget->setTabEnabled(1,true);
                 ui->tabWidget->setTabVisible(1,true);
                 }
                 else
@@ -146,6 +155,8 @@ void MainWindow::readMessage(const QString& str)
                 QMessageBox::information(this,"Para Yatırma","Para Yatırma başarılı.\nMevcut Bakiye: " +strList[2]+"₺");
 
                 ui->tabWidget->setTabVisible(2,false);//depositMoney
+                ui->tabWidget->setTabEnabled(2,false);
+                ui->tabWidget->setTabEnabled(1,true);
                 ui->tabWidget->setTabVisible(1,true);//menu
             }
         }
@@ -159,6 +170,8 @@ void MainWindow::readMessage(const QString& str)
                 QMessageBox::information(this,"Para Çekme","Para Çekildi.\nMevcut Bakiye: " +strList[2]+"₺");
 
                 ui->tabWidget->setTabVisible(3,false);//withdrawMoney
+                ui->tabWidget->setTabEnabled(3,true);
+                ui->tabWidget->setTabEnabled(1,true);
                 ui->tabWidget->setTabVisible(1,true);//menu
 
             }
@@ -178,6 +191,8 @@ void MainWindow::readMessage(const QString& str)
                 QMessageBox::information(this,"Para Transferi","Para Transferi Gerçekleşti. \n"+strList[2]+"\nMevcut Bakiye: " +strList[3]+"₺");
 
                 ui->tabWidget->setTabVisible(4,false);//transferMoney
+                ui->tabWidget->setTabEnabled(4,false);
+                ui->tabWidget->setTabEnabled(1,true);
                 ui->tabWidget->setTabVisible(1,true);//menu
 
                 ui->lineEdit_transferMoney_amount->clear();
@@ -236,13 +251,20 @@ void MainWindow::readMessage(const QString& str)
                 ui->label_CustomerData_nameOfTheBank->setText(bank);
                 ui->label_CustomerData_balance->setText(QString::number(balance)+"₺");
 
-                QMessageBox::information(this,"Para Transferi","Hesabınıza Para Geldi! ☺ \nMevcut Bakiye: " +strList[2]+"₺");
+                QMessageBox::information(this,"Para Transferi","Hesabınıza Para Geldi! ☺ \nMevcut Bakiye: " +strList[4]+"₺");
 
                 ui->tabWidget->setTabVisible(0,false);
                 ui->tabWidget->setTabVisible(2,false);
                 ui->tabWidget->setTabVisible(3,false);
                 ui->tabWidget->setTabVisible(4,false);
+
+                ui->tabWidget->setTabEnabled(1,true);
                 ui->tabWidget->setTabVisible(1,true);
+
+                ui->tabWidget->setTabEnabled(0,false);
+                ui->tabWidget->setTabEnabled(2,false);
+                ui->tabWidget->setTabEnabled(3,false);
+                ui->tabWidget->setTabEnabled(4,false);
 
 
             }
@@ -404,6 +426,8 @@ void MainWindow::on_pushButton_depositMoney_clicked()
 {
 
     ui->tabWidget->setTabVisible(1,false);//menu
+    ui->tabWidget->setTabEnabled(1,false);
+    ui->tabWidget->setTabEnabled(2,true);
     ui->tabWidget->setTabVisible(2,true);//depositMoney
 
     ui->label_depositMoney_CustomerData->setText("Kullanılabilir Bakiye: "+QString::number(balance)+"₺");
@@ -412,17 +436,19 @@ void MainWindow::on_pushButton_depositMoney_clicked()
 
 void MainWindow::on_pushButton_withdrawMoney_clicked()
 {
-
     ui->tabWidget->setTabVisible(1,false);//menu
+    ui->tabWidget->setTabEnabled(1,false);
+    ui->tabWidget->setTabEnabled(3,true);
     ui->tabWidget->setTabVisible(3,true);//withdrawMoney
     ui->label_withdrawMoney_CustomerData->setText("Kullanılabilir Bakiye: "+QString::number(balance)+"₺");
-
 }
 
 
 void MainWindow::on_pushButton_transferMoney_clicked()
 {
     ui->tabWidget->setTabVisible(1,false);//menu
+    ui->tabWidget->setTabEnabled(1,false);
+    ui->tabWidget->setTabEnabled(4,true);
     ui->tabWidget->setTabVisible(4,true);//transferMoney
     ui->label_transferMoney_CustomerData->setText("Kullanılabilir Bakiye: "+QString::number(balance)+"₺");
 
@@ -447,6 +473,8 @@ void MainWindow::on_pushButton_exit_clicked()
                                                 "\nSunucuya oturum kapatma bilgisi gönderilemedi.");
 
     ui->tabWidget->setTabVisible(1,false);//menu
+    ui->tabWidget->setTabEnabled(1,false);
+    ui->tabWidget->setTabEnabled(0,true);
     ui->lineEdit_UserLogin_userName->clear();
     ui->tabWidget->setTabVisible(0,true);//User Login
     QMessageBox::information(this,"Oturum Kapatıldı","Sn. "+name+ " Oturumunuz sonlandırıldı.");
@@ -472,6 +500,8 @@ void MainWindow::on_lineEdit_UserLogin_pass_returnPressed()
 void MainWindow::on_pushButton_depositMoney_cancel_clicked()
 {
     ui->tabWidget->setTabVisible(2,false);//depositMoney
+    ui->tabWidget->setTabEnabled(2,false);
+    ui->tabWidget->setTabEnabled(1,true);
     ui->tabWidget->setTabVisible(1,true);//menu
     ui->lineEdit_depositMoney_amount->clear();
 
@@ -492,8 +522,9 @@ void MainWindow::on_lineEdit_depositMoney_amount_returnPressed()
 
 void MainWindow::on_pushButton_withdrawMoney_cancel_clicked()
 {
-
     ui->tabWidget->setTabVisible(3,false);//withdrawMoney
+    ui->tabWidget->setTabEnabled(3,false);
+    ui->tabWidget->setTabEnabled(1,true);
     ui->tabWidget->setTabVisible(1,true);//menu
     ui->lineEdit_withdrawMoney_amount->clear();
 
@@ -516,10 +547,13 @@ void MainWindow::on_pushButton_transferMoney_cancel_clicked()
 {
 
     ui->tabWidget->setTabVisible(4,false);//transferMoney
+    ui->tabWidget->setTabEnabled(4,false);
+    ui->tabWidget->setTabEnabled(1,true);
     ui->tabWidget->setTabVisible(1,true);//menu
     ui->lineEdit_transferMoney_amount->clear();
     ui->lineEdit_transferMoney_customerID->clear();
     ui->lineEdit_transferMoney_customerName->clear();
+    ui->label_nameHint->clear();
 
 }
 
@@ -534,17 +568,16 @@ void MainWindow::on_lineEdit_transferMoney_amount_returnPressed()
     transferMoney();
 }
 
-void MainWindow::on_lineEdit_transferMoney_customerID_textChanged(const QString &arg1)
+void MainWindow::on_lineEdit_transferMoney_customerID_editingFinished()
 {
-   //A bug occurred due to the socket delay.
-    if (arg1.length()>0 && arg1.length()<2)//temporary solution
+    if(ui->lineEdit_transferMoney_customerID->text().length()>0)
     {
         if(socket)
         {
             if(socket->isOpen())
             {
-                str = "customerIDCheck,"+ //0
-                              arg1;       //1
+                str = "customerIDCheck,"+                            //0
+                      ui->lineEdit_transferMoney_customerID->text(); //1
 
                 sendStr();
             }
@@ -553,14 +586,15 @@ void MainWindow::on_lineEdit_transferMoney_customerID_textChanged(const QString 
         }
         else
             QMessageBox::critical(this,"QTCPClient","Client, sunucuya bağlı değil.");
-
     }
-    else
-        ui->label_nameHint->setText("");
+
+
 }
 
 
 
-
-
+void MainWindow::on_lineEdit_transferMoney_customerID_textEdited(const QString &arg1)
+{
+    ui->label_nameHint->clear();
+}
 
