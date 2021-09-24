@@ -39,7 +39,7 @@ Client - Para tranferi menüsü hata mesajı ekran görüntüleri
 ![Screenshot_206](https://user-images.githubusercontent.com/88648358/134530894-5fb86dac-cd16-45a3-b332-4635a382ffea.jpg)
 ![Screenshot_207](https://user-images.githubusercontent.com/88648358/134530999-ebb8506d-a70b-4e77-9eb7-53d0f71ddfe7.jpg)
 
-Client - Para tranferi işlemi sonucu uturumu başka bir istemcide açık olan kullanıcıya bildirim...
+Client - Para tranferi işlemi sonucu oturumu başka bir istemcide açık olan kullanıcıya bildirim...
 
 ![Screenshot_208](https://user-images.githubusercontent.com/88648358/134531062-f16d5ee9-7545-4d5c-92ba-e5aef67c2ed8.jpg)
 
