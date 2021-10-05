@@ -112,7 +112,7 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
             QMessageBox::information(this, "QTCPServer", "Bağlantı  reddedildi. QTCPServer'ın çalıştığından emin olun. Host ve bağlantı noktası ayarlarının doğru olduğunu kontrol edin.");
         break;
         default:
-            QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
+            QTcpSocket* socket = qobject_cast<QTcpSocket*> (sender());
             QMessageBox::information(this, "QTCPServer", QString("Bir hata oluştu: %1.").arg(socket->errorString()));
         break;
     }
@@ -264,7 +264,7 @@ void MainWindow::replyMessage(const QString& str)
 
            }
            else
-           {
+           {   d.findCustomer(strList[1].toInt());
                strPost="withdrawMoney,insufficientBalance,"+QString::number(d.balance);
                AutoSentMessage();
 
@@ -360,7 +360,7 @@ void MainWindow::refreshLabel(){
     foreach(QTcpSocket* socket, connection_set)
     {
         receiverClientList<<QString::number(socket->socketDescriptor());
-        label=label+"\n"+QString::number(socket->socketDescriptor());
+        label=QString::number(socket->socketDescriptor())+"\n"+label;
         ui->label_receiverClientList->setText(label);
         ui->label_clientNumber->setText(QString::number(clientNumber));
 
