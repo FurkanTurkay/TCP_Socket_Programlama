@@ -30,6 +30,7 @@ signals:
 private slots:
     void readSocket();
     void discardSocket();
+    void connectServer();
     void displayError(QAbstractSocket::SocketError socketError);
     void readMessage(const QString& str);
     void sendStr();
@@ -74,6 +75,10 @@ private slots:
 
     void on_lineEdit_transferMoney_customerID_textEdited(const QString &arg1);
 
+    void on_pushButton_UserLogin_cancel_clicked();
+
+    void on_pushButton_reconnect_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -85,13 +90,17 @@ private:
     QString strPost;
     QString strGet;
 
-    int ID;
+
+    int ID=-1;
     QString name;
     QString bank;
     double balance;
 
     QString recevier_name;
     QString recevier_lastName;
+
+    bool serverStatus; // true: Server is running.
+    bool IsProgramWorking=true;
 
 };
 
