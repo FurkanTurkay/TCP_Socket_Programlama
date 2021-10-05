@@ -11,6 +11,7 @@
 #include <QThread>
 #include <QValidator>
 #include <QDataStream>
+#include <QTimer>
 
 namespace Ui {
 class MainWindow;
@@ -27,10 +28,12 @@ public:
 
 signals:
     void newMessage(QString);
+    void statusChanged(bool);
 private slots:
     void readSocket();
     void discardSocket();
     void connectServer();
+    void reconnect2Server();
     void displayError(QAbstractSocket::SocketError socketError);
     void readMessage(const QString& str);
     void sendStr();
@@ -40,6 +43,7 @@ private slots:
     void withdrawMoney();
     void transferMoney();
     bool invalidEntry(QString text);
+
 
     void on_pushButton_depositMoney_clicked();
 
@@ -77,8 +81,6 @@ private slots:
 
     void on_pushButton_UserLogin_cancel_clicked();
 
-    void on_pushButton_reconnect_clicked();
-
 private:
     Ui::MainWindow *ui;
 
@@ -101,6 +103,8 @@ private:
 
     bool serverStatus; // true: Server is running.
     bool IsProgramWorking=true;
+
+    QTimer *timer;
 
 };
 

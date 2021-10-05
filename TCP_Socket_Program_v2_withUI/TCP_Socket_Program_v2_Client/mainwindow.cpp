@@ -21,16 +21,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->setTabVisible(5,false);
     ui->tabWidget->setUsesScrollButtons(false);
 
-
-
     ui->lineEdit_transferMoney_customerID->setValidator(new QIntValidator());
     ui->lineEdit_withdrawMoney_amount->setValidator(new QIntValidator());
     ui->lineEdit_depositMoney_amount->setValidator(new QIntValidator());
     ui->lineEdit_transferMoney_amount->setValidator(new QIntValidator());
 
     ui->label_loginInfo->setText("Hoşgeldiniz. Lütfen giriş yapınız.");
-
+    serverStatus=false;
     connectServer();
+    timer= new QTimer(this);
+    connect(timer,SIGNAL(timeout()),this,SLOT(reconnect2Server()));
+    timer->start(3000);
+
+
 }
 
 MainWindow::~MainWindow()
@@ -62,9 +65,6 @@ void MainWindow::readSocket()
     QString message = QString("%1;%2").arg(socket->socketDescriptor()).arg(QString::fromStdString(buffer.toStdString()));
     emit newMessage(message);
 
-
-
-
 }
 
 void MainWindow::discardSocket()
@@ -73,8 +73,7 @@ void MainWindow::discardSocket()
     socket=nullptr;
     ui->statusBar->showMessage("Bağlantı Kesildi!");
     serverStatus=false;
-    if(IsProgramWorking)
-    {
+
     if(ID!=-1)
     {
         ui->tabWidget->setTabVisible(1,false);//menu
@@ -99,6 +98,7 @@ void MainWindow::discardSocket()
         name="";
         balance=-1;
     }
+
     else
     {
         ui->tabWidget->setTabEnabled(0,false);//UserLogin
@@ -109,23 +109,18 @@ void MainWindow::discardSocket()
         ui->tabWidget->setTabVisible(5,true);
     }
 
-    }
-
-
-
 }
 
 void MainWindow::connectServer()
 {
-
-    serverStatus=false;
     socket = new QTcpSocket(this);
 
     connect(this, &MainWindow::newMessage, this, &MainWindow::readMessage);
     connect(socket, &QTcpSocket::readyRead, this, &MainWindow::readSocket);
     connect(socket, &QTcpSocket::disconnected, this, &MainWindow::discardSocket);
     connect(socket, &QAbstractSocket::errorOccurred, this, &MainWindow::displayError);
-//    connect(socket, &QAbstractSocket::connected, this, &MainWindow::connectServer);
+
+    //    connect(socket, &QAbstractSocket::connected, this, &MainWindow::connectServer);
 
     socket->connectToHost(QHostAddress::LocalHost,8080);
 
@@ -146,11 +141,13 @@ void MainWindow::connectServer()
 
     else
     {
-        QMessageBox::critical(this,"QTCPClient", QString("Bir hata oluştu %1.").arg(socket->errorString()));
+        ui->statusBar->showMessage(QString("Bağlantı bekleniyor... - HATA: %1.").arg(socket->errorString()));
 //        exit(EXIT_FAILURE);
     }
 
-////    socket = new QTcpSocket(this);
+
+
+//    socket = new QTcpSocket(this);
 //    socket->connectToHost(QHostAddress::LocalHost,8080);
 
 //    if(socket->waitForConnected()){
@@ -165,6 +162,50 @@ void MainWindow::connectServer()
 
 }
 
+void MainWindow::reconnect2Server()
+{
+    if(!serverStatus)
+    {
+
+        //serverStatus=false;
+        socket = new QTcpSocket(this);
+
+        connect(this, &MainWindow::newMessage, this, &MainWindow::readMessage);
+        connect(socket, &QTcpSocket::readyRead, this, &MainWindow::readSocket);
+        connect(socket, &QTcpSocket::disconnected, this, &MainWindow::discardSocket);
+        connect(socket, &QAbstractSocket::errorOccurred, this, &MainWindow::displayError);
+
+        //    connect(socket, &QAbstractSocket::connected, this, &MainWindow::connectServer);
+
+        socket->connectToHost(QHostAddress::LocalHost,8080);
+
+        if(socket->waitForConnected())
+        {
+            ui->statusBar->showMessage("Sunucuya bağlandı.");
+            serverStatus=true;
+
+            ui->tabWidget->setTabVisible(5,false);//serverUI
+            ui->tabWidget->setTabEnabled(5,false);//serverUI
+
+            ui->tabWidget->setTabEnabled(0,true);
+            ui->lineEdit_UserLogin_userName->clear();
+            ui->tabWidget->setTabVisible(0,true);//UserLogin
+
+
+        }
+
+        else
+        {
+            ui->statusBar->showMessage(QString("Bağlantı bekleniyor... - HATA: %1.").arg(socket->errorString()));
+    //        exit(EXIT_FAILURE);
+        }
+    }
+    else
+        ui->statusBar->showMessage("Sunucuya bağlandı.");
+}
+
+
+
 void MainWindow::displayError(QAbstractSocket::SocketError socketError)
 {
 
@@ -172,15 +213,17 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
            case QAbstractSocket::RemoteHostClosedError:
            break;
            case QAbstractSocket::HostNotFoundError:
-               QMessageBox::information(this, "QTCPClient", "Host bulunamadı. Lütfen host adını ve bağlantı noktası ayarlarını kontrol edin.");
+               ui->statusBar->showMessage(QString("Bağlantı bekleniyor... - Host adını ve bağlantı noktası ayarlarını kontrol edin. :").arg(socket->errorString()));
            break;
            case QAbstractSocket::ConnectionRefusedError:
-               QMessageBox::information(this, "QTCPClient", "Bağlantı reddedildi. QTCPServer'ın çalıştığından emin olun. Host adını ve bağlantı noktası ayarlarını kontrol edin. ");
+               ui->statusBar->showMessage(QString("Bağlantı bekleniyor... - QTCPServer'ın çalıştığından emin olun. :").arg(socket->errorString()));
                ui->tabWidget->setTabEnabled(5,true);//serverUI
                ui->tabWidget->setTabVisible(5,true);
            break;
            default:
-               QMessageBox::information(this, "QTCPClient", QString("Bir hata oluştu: %1.").arg(socket->errorString()));
+               //ui->statusBar->showMessage(QString("Bağlantı bekleniyor... - HATA: %1.").arg(socket->errorString()));
+               qDebug()<<"default error: "<<socket->errorString();
+               //QMessageBox::information(this, "QTCPClient", QString("Bir hata oluştu: %1.").arg(socket->errorString()));
            break;
        }
 
@@ -718,15 +761,6 @@ void MainWindow::on_pushButton_UserLogin_cancel_clicked()
 }
 
 
-void MainWindow::on_pushButton_reconnect_clicked()
-{
-    if(!serverStatus)
-    {
-        connectServer();
-    }
-    else
-        QMessageBox::warning(this,"SUNUCU","Sunucu zaten çalışıyor.");
-}
 
 
 

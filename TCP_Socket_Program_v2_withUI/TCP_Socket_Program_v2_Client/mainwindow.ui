@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>445</width>
-    <height>525</height>
+    <height>469</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -1138,7 +1138,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>102</height>
+            <height>39</height>
            </size>
           </property>
          </spacer>
@@ -1149,7 +1149,7 @@
            <widget class="QLabel" name="label_ServerInfo">
             <property name="font">
              <font>
-              <pointsize>12</pointsize>
+              <pointsize>25</pointsize>
              </font>
             </property>
             <property name="text">
@@ -1191,7 +1191,7 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;QTCPServer'ın çalıştığından emin olun ve&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;yeniden bağlanmayı deneyin.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; color:#000000;&quot;&gt;QTCPServer'ın çalıştığından emin olun.&lt;br/&gt;&lt;br/&gt;Host adını ve bağlantı noktası ayarlarını kontrol edin.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -1201,58 +1201,28 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_12">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_11">
-              <item>
-               <widget class="QLabel" name="label_5">
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="layoutDirection">
-                 <enum>Qt::LeftToRight</enum>
-                </property>
-                <property name="text">
-                 <string>SUNUCU DURUMU:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_13">
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="layoutDirection">
-                 <enum>Qt::LeftToRight</enum>
-                </property>
-                <property name="text">
-                 <string>KAPALI</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <layout class="QHBoxLayout" name="horizontalLayout_11"/>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_reconnect">
+             <widget class="QLabel" name="label_ServerInfo2_3">
+              <property name="minimumSize">
+               <size>
+                <width>390</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="font">
                <font>
                 <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
                </font>
               </property>
               <property name="text">
-               <string>TEKRAR BAĞLAN</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;SUNUCU KULLANILABİLİR OLDUĞUNDA&lt;/p&gt;&lt;p&gt;OTOMATİK OLARAK YENİDEN&lt;/p&gt;&lt;p&gt;BAĞLANACAKTIR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -1268,7 +1238,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>101</height>
+            <height>39</height>
            </size>
           </property>
          </spacer>
