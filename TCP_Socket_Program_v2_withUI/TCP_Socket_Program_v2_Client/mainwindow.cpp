@@ -88,10 +88,10 @@ void MainWindow::discardSocket()
         ui->tabWidget->setTabEnabled(0,false);//UserLogin
         ui->tabWidget->setTabVisible(0,false);
         ui->lineEdit_UserLogin_userName->clear();
-        QMessageBox::information(this,"BAĞLANTI KESİLDİ!","Oturumunuz sonlandırıldı.");
-
         ui->tabWidget->setTabEnabled(5,true);//serverUI
         ui->tabWidget->setTabVisible(5,true);
+
+        ui->label_ServerInfoMessage->setText("Oturumunuz sonlandırıldı!");
 
         ID=-1;
         bank="";
@@ -103,10 +103,12 @@ void MainWindow::discardSocket()
     {
         ui->tabWidget->setTabEnabled(0,false);//UserLogin
         ui->tabWidget->setTabVisible(0,false);
-        QMessageBox::information(this,"BAĞLANTI KESİLDİ!","QTCPServer ile bağlantı sonlandırıldı. ");
-
         ui->tabWidget->setTabEnabled(5,true);//serverUI
         ui->tabWidget->setTabVisible(5,true);
+
+        ui->label_ServerInfoMessage->setText("QTCPServer ile bağlantı sonlandırıldı.");
+
+
     }
 
 }
